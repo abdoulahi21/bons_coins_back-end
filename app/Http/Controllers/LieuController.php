@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Place;
 use Illuminate\Http\Request;
+use function Symfony\Component\Translation\t;
 
 class LieuController extends Controller
 {
@@ -11,7 +13,25 @@ class LieuController extends Controller
      */
     public function index()
     {
-        //
+        try {
+            $places = Place::all();
+            return response()->json([
+                'places' => $places->map(function($place) {
+                    return [
+                        'name' => $place->name,
+                        'description' => $place->description,
+                        'address' => $place->address,
+                        'phone' => $place->phone,
+                        'category' => $place->category,
+                        'image'=>$place->image_url, // Utilisez l'URL complète
+                        'latitude' => $place->latitude,
+                        'longitude' => $place->longitude,
+                    ];
+                })
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([$places,'message' => $e->getMessage()], 500);
+        }
     }
 
     /**
@@ -28,6 +48,35 @@ class LieuController extends Controller
     public function store(Request $request)
     {
         //
+        $request->validate([
+            'name' => 'required',
+            'description' => 'required',
+            'latitude' => 'required',
+            'longitude' => 'required',
+            'image' => 'image|mimes:jpeg,png,jpg,gif,svg,webp|max:2048',
+            'category' => 'required',
+            'phone' => 'required',
+            'address' => 'required',
+        ]);
+        //pour l'image
+        $fileName = time() . '.' . $request->image->extension();
+        $request->image->storeAs('public/images', $fileName);
+        try {
+            $lieu = new Place();
+            $lieu->name = $request->name;
+            $lieu->address = $request->address;
+            $lieu->phone = $request->phone;
+            $lieu->description = $request->description;
+            $lieu-> image = $fileName;
+            $lieu->category = $request->category;
+            $lieu->latitude = $request->latitude;
+            $lieu->longitude = $request->longitude;
+            //$lieu->number_opinions = $request->number_opinions;
+            $lieu->save();
+            return response()->json($lieu);
+        } catch (\Exception $e) {
+            return response()->json(['message' => $e->getMessage()], 500);
+        }
     }
 
     /**
@@ -36,6 +85,9 @@ class LieuController extends Controller
     public function show(string $id)
     {
         //
+        return response([
+            'place'=>Place::where('id',$id)->withCount('opinions','likes')->get()
+        ],200);
     }
 
     /**
@@ -52,6 +104,35 @@ class LieuController extends Controller
     public function update(Request $request, string $id)
     {
         //
+        $request->validate([
+            'name' => 'required',
+            'description' => 'required',
+            'latitude' => 'required',
+            'longitude' => 'required',
+            'image' => 'image|mimes:jpeg,png,jpg,gif,svg,webp|max:2048',
+            'category' => 'required',
+            'phone' => 'required',
+            'address' => 'required',
+        ]);
+        //pour l'image
+        $fileName = time() . '.' . $request->image->extension();
+        $request->image->storeAs('public/images', $fileName);
+        try {
+            $lieu = Place::find($id);
+            $lieu->name = $request->name;
+            $lieu->address = $request->address;
+            $lieu->phone = $request->phone;
+            $lieu->description = $request->description;
+            $lieu-> image = $fileName;
+            $lieu->category = $request->category;
+            $lieu->latitude = $request->latitude;
+            $lieu->longitude = $request->longitude;
+            //$lieu->number_opinions = $request->number_opinions;
+            $lieu->save();
+            return response()->json($lieu);
+        } catch (\Exception $e) {
+            return response()->json(['message' => $e->getMessage()], 500);
+        }
     }
 
     /**
@@ -60,5 +141,12 @@ class LieuController extends Controller
     public function destroy(string $id)
     {
         //
+        try {
+            $lieu = Place::find($id);
+            $lieu->delete();
+            return response()->json(['message' => 'Place deleted']);
+        } catch (\Exception $e) {
+            return response()->json(['message' => $e->getMessage()], 500);
+        }
     }
 }

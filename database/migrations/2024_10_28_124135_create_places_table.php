@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('lieus', function (Blueprint $table) {
+        Schema::create('places', function (Blueprint $table) {
             $table->id();
             $table->string('name');
             $table->string('address');
@@ -21,7 +21,6 @@ return new class extends Migration
             $table->string('category');
             $table->double('latitude');
             $table->double('longitude');
-            $table->integer('number_opinions');
             $table->timestamps();
         });
     }
@@ -31,6 +30,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('lieus');
+        Schema::dropIfExists('places');
     }
 };

@@ -62,7 +62,7 @@ class UserController extends Controller
             return response()->json(['message' => 'Invalid credentials'], 401);
         }
 
-        $token = $user->createToken('auth_token')->plainTextToken;
+         $token = $user->createToken('auth_token')->plainTextToken;
         return response()->json(['token' => $token, 'token_type' => 'Bearer']);
     }
     /**
