@@ -31,7 +31,7 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
 
     //place
     Route::post('/places', [LieuController::class, 'store']);
-    Route::get('/places', [LieuController::class, 'index']);
+
     Route::get('/places/{id}', [LieuController::class, 'show']);
     Route::put('/places/{id}', [LieuController::class, 'update']);
     Route::delete('/places/{id}', [LieuController::class, 'destroy']);
@@ -42,8 +42,7 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
     Route::get('/places/{id}/opinions/{idOpinion}', [OpinionController::class, 'show']);
     Route::put('/opinions/{id}', [OpinionController::class, 'update']);
     Route::delete('/opinions/{id}', [OpinionController::class, 'destroy']);
-
     //like
     Route::post('/places/{id}/likes', [LikeController::class, 'likeOrUnLike']);
 });
-
+Route::get('/places', [LieuController::class, 'index']);

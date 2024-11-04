@@ -13,25 +13,9 @@ class LieuController extends Controller
      */
     public function index()
     {
-        try {
-            $places = Place::all();
-            return response()->json([
-                'places' => $places->map(function($place) {
-                    return [
-                        'name' => $place->name,
-                        'description' => $place->description,
-                        'address' => $place->address,
-                        'phone' => $place->phone,
-                        'category' => $place->category,
-                        'image'=>$place->image_url, // Utilisez l'URL complète
-                        'latitude' => $place->latitude,
-                        'longitude' => $place->longitude,
-                    ];
-                })
-            ]);
-        } catch (\Exception $e) {
-            return response()->json([$places,'message' => $e->getMessage()], 500);
-        }
+            return response([
+                'places'=> Place::orderBy('created_at', 'desc')->withCount('opinions','likes')->get()
+                ],200);
     }
 
     /**
@@ -51,17 +35,22 @@ class LieuController extends Controller
         $request->validate([
             'name' => 'required',
             'description' => 'required',
-            'latitude' => 'required',
-            'longitude' => 'required',
-            'image' => 'image|mimes:jpeg,png,jpg,gif,svg,webp|max:2048',
+            'latitude' => 'required|numeric|between:-90,90|regex:/^[-]?(([0-8]?[0-9])\.(\d+))|(90(\.0+)?)$/',
+            'longitude' => 'required|numeric|between:-180,180|regex:/^[-]?((1[0-7][0-9])\.(\d+))|(180(\.0+)?)$/',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg,webp|max:2048',
             'category' => 'required',
             'phone' => 'required',
             'address' => 'required',
         ]);
-        //pour l'image
-        $fileName = time() . '.' . $request->image->extension();
-        $request->image->storeAs('public/images', $fileName);
+        // Si une image est fournie, la stocker
+
         try {
+            $fileName = null;
+            if ($request->hasFile('image')) {
+                $fileName = time() . '.' . $request->image->extension();
+                $request->image->storeAs('public/images', $fileName);
+            }
+
             $lieu = new Place();
             $lieu->name = $request->name;
             $lieu->address = $request->address;
@@ -71,7 +60,6 @@ class LieuController extends Controller
             $lieu->category = $request->category;
             $lieu->latitude = $request->latitude;
             $lieu->longitude = $request->longitude;
-            //$lieu->number_opinions = $request->number_opinions;
             $lieu->save();
             return response()->json($lieu);
         } catch (\Exception $e) {
