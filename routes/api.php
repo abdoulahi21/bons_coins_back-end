@@ -25,14 +25,14 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 //routes public
 Route::post('/login', [UserController::class, 'login']);
 Route::post('/register', [UserController::class, 'store']);
-
+Route::delete('/logout', [UserController::class, 'logout']);
 //routes protected
 Route::group(['middleware' => 'auth:sanctum'], function () {
 
     //place
     Route::post('/places', [LieuController::class, 'store']);
 
-    Route::get('/places/{id}', [LieuController::class, 'show']);
+
     Route::put('/places/{id}', [LieuController::class, 'update']);
     Route::delete('/places/{id}', [LieuController::class, 'destroy']);
 
@@ -46,3 +46,4 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
     Route::post('/places/{id}/likes', [LikeController::class, 'likeOrUnLike']);
 });
 Route::get('/places', [LieuController::class, 'index']);
+Route::get('/places/{id}', [LieuController::class, 'show']);
