@@ -25,10 +25,11 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 //routes public
 Route::post('/login', [UserController::class, 'login']);
 Route::post('/register', [UserController::class, 'store']);
-Route::delete('/logout', [UserController::class, 'logout']);
+
 //routes protected
 Route::group(['middleware' => 'auth:sanctum'], function () {
-
+    Route::get('/user',[UserController::class,'index']);
+    Route::post('/logout', [UserController::class, 'logout']);
     //place
     Route::post('/places', [LieuController::class, 'store']);
 
