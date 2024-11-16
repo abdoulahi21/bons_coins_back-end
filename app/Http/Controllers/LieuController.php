@@ -37,7 +37,7 @@ class LieuController extends Controller
             'description' => 'required',
             'latitude' => 'required|numeric|between:-90,90|regex:/^[-]?(([0-8]?[0-9])\.(\d+))|(90(\.0+)?)$/',
             'longitude' => 'required|numeric|between:-180,180|regex:/^[-]?((1[0-7][0-9])\.(\d+))|(180(\.0+)?)$/',
-            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg,webp|max:2048',
+           // 'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg,webp|max:2048',
             'category' => 'required',
             'phone' => 'required',
             'address' => 'required',
@@ -45,18 +45,18 @@ class LieuController extends Controller
         // Si une image est fournie, la stocker
 
         try {
-            $fileName = null;
-            if ($request->hasFile('image')) {
-                $fileName = time() . '.' . $request->image->extension();
-                $request->image->storeAs('public/images', $fileName);
-            }
-
+//            $fileName = null;
+//            if ($request->hasFile('image')) {
+//                $fileName = time() . '.' . $request->image->extension();
+//                $request->image->storeAs('public/images', $fileName);
+//            }
+            $image=$this->saveimage($request->image,'path');
             $lieu = new Place();
             $lieu->name = $request->name;
             $lieu->address = $request->address;
             $lieu->phone = $request->phone;
             $lieu->description = $request->description;
-            $lieu-> image = $fileName;
+            $lieu-> image = $image;
             $lieu->category = $request->category;
             $lieu->latitude = $request->latitude;
             $lieu->longitude = $request->longitude;

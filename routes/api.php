@@ -30,6 +30,7 @@ Route::post('/register', [UserController::class, 'store']);
 Route::group(['middleware' => 'auth:sanctum'], function () {
     Route::get('/user',[UserController::class,'index']);
     Route::post('/logout', [UserController::class, 'logout']);
+
     //place
     Route::post('/places', [LieuController::class, 'store']);
 
